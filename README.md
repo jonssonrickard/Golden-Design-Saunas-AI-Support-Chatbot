@@ -4,7 +4,7 @@
 
 This project is a customer support chatbot for Golden Design Saunas, built with JavaScript, Node.js, Express and the OpenAI API.
 
-The chatbot uses RAG, chunks, embeddings and a local vector store to retrieve relevant information from the knowledge base before answering customer questions.
+The chatbot uses RAG, chunks, embeddings and a local vector store to retrieve relevant information before answering customer questions.
 
 ## Main files
 
