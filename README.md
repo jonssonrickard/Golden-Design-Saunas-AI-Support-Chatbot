@@ -2,7 +2,7 @@
 
 <a href="https://jonssonrickard.github.io/Golden-Design-Saunas-AI-Support-Chatbot/" target="_blank" rel="noopener noreferrer">LIVE DEMO</a>
 
-This project is a customer support chatbot for Golden Design Saunas, built with JavaScript, Node.js, Express and the OpenAI API.
+This project is a customer support chatbot for [Golden Design Saunas](https://goldendesignsaunas.com/), built with JavaScript, Node.js, Express and the OpenAI API.
 
 The chatbot uses RAG, chunks, embeddings and a local vector store to retrieve relevant information before answering customer questions.
 
