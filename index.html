@@ -1,19 +1,27 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-  #chatbot-toggle {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: none;
-    background: #000000;
-    color: white;
-    font-size: 28px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    z-index: 10000;
-  }
+#chatbot-toggle {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  min-height: 60px;
+  bottom: 25px;
+  right: 20px;
+  border-radius: 50%;
+  border: none;
+  background: #000000;
+  color: white;
+  font-size: 36px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
 
   #chatbot-box {
     display: none;
@@ -39,7 +47,7 @@
   }
 
   #chat-messages {
-    height: 340;
+    height: 340px;
     overflow-y: auto;
     padding: 12px;
     font-size: 14px;
@@ -119,6 +127,17 @@
   #chatbot-toggle:hover {
     opacity: 0.9;
   }
+
+@media screen and (max-width: 768px) {
+  #chatbot-toggle {
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    min-height: 60px !important;
+    font-size: 34px !important;
+    line-height: 60px !important;
+  }
+}
 </style>
 
 <!-- Chat toggle button -->
@@ -161,15 +180,15 @@
     if (box.style.display === "none" || box.style.display === "") {
       box.style.display = "block";
       button.innerHTML = "×";
-      button.style.fontSize = "36px";
+      button.style.fontSize = "34px";
       button.style.lineHeight = "60px";
       document.getElementById("chat-input").focus();
-    } else {
+      } else {
       box.style.display = "none";
       button.innerHTML = "💬";
-      button.style.fontSize = "28px";
-      button.style.lineHeight = "normal";
-    }
+      button.style.fontSize = "34px";
+      button.style.lineHeight = "60px";
+      }
   }
 
   function escapeHTML(text) {
