@@ -1,0 +1,288 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+#chatbot-toggle {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  min-height: 60px;
+  bottom: 25px;
+  right: 20px;
+  border-radius: 50%;
+  border: none;
+  background: #000000;
+  color: white;
+  font-size: 36px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+  #chatbot-box {
+    display: none;
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 390px;
+    max-width: calc(100vw - 40px);
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    background: white;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+    z-index: 9999;
+  }
+
+  #chatbot-header {
+    background: #000000;
+    color: white;
+    padding: 14px;
+    font-weight: bold;
+  }
+
+  #chat-messages {
+    height: 340px;
+    overflow-y: auto;
+    padding: 12px;
+    font-size: 14px;
+    background: #f9fafb;
+  }
+
+  .chat-message {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  .user-message {
+    justify-content: flex-end;
+  }
+
+  .bot-message {
+    justify-content: flex-start;
+  }
+
+.chat-bubble {
+  display: inline-block;
+  width: fit-content;
+  max-width: 88%;
+  padding: 9px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  box-sizing: border-box;
+}
+
+  .user-bubble {
+    background: #000000;
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  .bot-bubble {
+    background: #e5e7eb;
+    color: #111827;
+    border-bottom-left-radius: 4px;
+  }
+
+  .typing-bubble {
+    background: #e5e7eb;
+    color: #6b7280;
+    font-style: italic;
+  }
+
+  #chat-input-area {
+    display: flex;
+    border-top: 1px solid #ddd;
+    background: white;
+  }
+
+  #chat-input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+  }
+
+  #chat-send-button {
+    width: 48px;
+    border: none;
+    background: #000000;
+    color: white;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  #chat-send-button:hover,
+  #chatbot-toggle:hover {
+    opacity: 0.9;
+  }
+
+@media screen and (max-width: 768px) {
+  #chatbot-toggle {
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    min-height: 60px !important;
+    font-size: 34px !important;
+    line-height: 60px !important;
+  }
+}
+</style>
+
+<!-- Chat toggle button -->
+<button id="chatbot-toggle" onclick="toggleChatbot()">
+  💬
+</button>
+
+<!-- Chat box -->
+<div id="chatbot-box">
+
+  <!-- Header -->
+  <div id="chatbot-header">
+    Golden Design Saunas
+  </div>
+
+<!-- Messages -->
+<div id="chat-messages">
+  <div class="chat-message bot-message">
+    <div class="chat-bubble bot-bubble">
+👋 Hi, message us with any questions. We're happy to help!
+    </div>
+  </div>
+</div>
+
+  <!-- Input area -->
+  <div id="chat-input-area">
+    <input id="chat-input" type="text" placeholder="Write message">
+
+    <button id="chat-send-button" onclick="sendMessage()">
+      ➤
+    </button>
+  </div>
+</div>
+
+<script>
+  function toggleChatbot() {
+    const box = document.getElementById("chatbot-box");
+    const button = document.getElementById("chatbot-toggle");
+
+    if (box.style.display === "none" || box.style.display === "") {
+      box.style.display = "block";
+      button.innerHTML = "×";
+      button.style.fontSize = "34px";
+      button.style.lineHeight = "60px";
+      document.getElementById("chat-input").focus();
+      } else {
+      box.style.display = "none";
+      button.innerHTML = "💬";
+      button.style.fontSize = "34px";
+      button.style.lineHeight = "60px";
+      }
+  }
+
+  function escapeHTML(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function addMessage(sender, text) {
+    const messages = document.getElementById("chat-messages");
+
+    const messageWrapper = document.createElement("div");
+    messageWrapper.classList.add("chat-message");
+
+    const bubble = document.createElement("div");
+    bubble.classList.add("chat-bubble");
+    bubble.textContent = text;
+
+    if (sender === "user") {
+      messageWrapper.classList.add("user-message");
+      bubble.classList.add("user-bubble");
+    } else {
+      messageWrapper.classList.add("bot-message");
+      bubble.classList.add("bot-bubble");
+    }
+
+    messageWrapper.appendChild(bubble);
+    messages.appendChild(messageWrapper);
+    messages.scrollTop = messages.scrollHeight;
+
+    return messageWrapper;
+  }
+
+  function addTypingMessage() {
+    const messages = document.getElementById("chat-messages");
+
+    const messageWrapper = document.createElement("div");
+    messageWrapper.classList.add("chat-message", "bot-message");
+    messageWrapper.id = "typing-message";
+
+    const bubble = document.createElement("div");
+    bubble.classList.add("chat-bubble", "typing-bubble");
+    bubble.textContent = "Typing...";
+
+    messageWrapper.appendChild(bubble);
+    messages.appendChild(messageWrapper);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function removeTypingMessage() {
+    const typingMessage = document.getElementById("typing-message");
+    if (typingMessage) {
+      typingMessage.remove();
+    }
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById("chat-input");
+    const userMessage = input.value.trim();
+
+    if (!userMessage) return;
+
+    addMessage("user", userMessage);
+    input.value = "";
+    addTypingMessage();
+
+    try {
+      const response = await fetch("https://golden-design-saunas.onrender.com/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: userMessage })
+      });
+
+      const data = await response.json();
+
+      removeTypingMessage();
+
+      if (data.answer) {
+        addMessage("bot", data.answer);
+      } else {
+        addMessage("bot", "Sorry, I could not find an answer.");
+      }
+
+    } catch (error) {
+      removeTypingMessage();
+      addMessage("bot", "Sorry, something went wrong.");
+    }
+  }
+
+  document.getElementById("chat-input").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  });
+</script>
