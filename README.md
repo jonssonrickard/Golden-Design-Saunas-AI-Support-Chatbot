@@ -1,4 +1,4 @@
-# Golden Design Saunas Chatbot
+# Golden Design Saunas – AI Support Chatbot
 
 <a href="https://jonssonrickard.github.io/Golden-Design-Saunas-AI-Support-Chatbot/" target="_blank" rel="noopener noreferrer">LIVE DEMO</a>
 
