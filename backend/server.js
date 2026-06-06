@@ -121,7 +121,6 @@ ${message}
     res.json({
       answer: response.output_text,
     });
-    
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({
