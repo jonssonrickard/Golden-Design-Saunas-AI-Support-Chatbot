@@ -11,28 +11,9 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Read general knowledge file
-const generalKnowledgePath = path.join(
-  __dirname,
-  "../data/golden_design_knowledge_base.md"
-);
-
-const productCataloguePath = path.join(
-  __dirname,
-  "../data/golden_design_product_catalogue.md"
-);
-
-const generalKnowledge = fs.readFileSync(generalKnowledgePath, "utf-8");
-const productCatalogue = fs.readFileSync(productCataloguePath, "utf-8");
-
-// Combine both files into one knowledge base
-const knowledgeBase = `
-GENERAL KNOWLEDGE:
-${generalKnowledge}
-
-PRODUCT CATALOGUE:
-${productCatalogue}
-`;
+// Read vector store
+const vectorStorePath = path.join(__dirname, "vectorStore.json");
+const vectorStore = JSON.parse(fs.readFileSync(vectorStorePath, "utf-8"));
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,6 +25,39 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+function cosineSimilarity(a, b) {
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+
+  for (let i = 0; i < a.length; i++) {
+    dotProduct += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+async function findRelevantChunks(question) {
+  const embeddingResponse = await client.embeddings.create({
+    model: "text-embedding-3-small",
+    input: question,
+  });
+
+  const questionEmbedding = embeddingResponse.data[0].embedding;
+
+  const rankedChunks = vectorStore
+    .map(chunk => ({
+      ...chunk,
+      similarity: cosineSimilarity(questionEmbedding, chunk.embedding),
+    }))
+    .sort((a, b) => b.similarity - a.similarity)
+    .slice(0, 5);
+
+  return rankedChunks.map(chunk => chunk.text).join("\n\n");
+}
+
 app.get("/", (req, res) => {
   res.send("Golden Design chatbot backend is running");
 });
@@ -51,6 +65,8 @@ app.get("/", (req, res) => {
 app.post("/chat", async (req, res) => {
   try {
     const { message } = req.body;
+
+    const relevantKnowledge = await findRelevantChunks(message);
 
     const response = await client.responses.create({
       model: "gpt-4o-mini",
@@ -94,13 +110,11 @@ Rules:
 12. If the customer asks something unrelated to Golden Design Saunas, politely say that you can only help with Golden Design Saunas products and support information.
 13. Ask a follow-up question when the question is broad.
 
-KNOWLEDGE BASE:
-${knowledgeBase}
+RELEVANT KNOWLEDGE:
+${relevantKnowledge}
 
 CUSTOMER QUESTION:
 ${message}
-      `,
-    });
 
     res.json({
       answer: response.output_text,
